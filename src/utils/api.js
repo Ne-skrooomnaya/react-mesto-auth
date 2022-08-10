@@ -1,149 +1,79 @@
-export const baseUrl = 'https://auth.nomoreparties.co';
 class Api {
   constructor(config) {
-    this._cardsUrl = config.cardsUrl;
-    this._userInfoUrl = config.userInfoUrl;
-    this._userAvatarUrl = config.userAvatarUrl;
+    this._baseUrl = config.baseUrl;
     this._headers = config.headers;
   }
 
+  _checkResponse(res) {
+    if (res.ok) {
+      return res.json();
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  }
+
   getUserInfo() {
-    return fetch(this._userInfoUrl, {
+    return fetch(`${this._baseUrl}users/me/`, {
       method: 'GET',
       headers: this._headers
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Что-то не так с запросом информации о пользователе');
-    });
+    })
+      .then(this._checkResponse)
   }
 
   editUserInfo(data) {
-    return fetch(this._userInfoUrl, {
+    return fetch(`${this._baseUrl}users/me/`, {
       method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify(data)
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Не удалось изменить информацию о пользователе')
-    });
+    })
+      .then(this._checkResponse)
   }
 
   editUserAvatar(newAvatarUrl) {
-    return fetch(this._userAvatarUrl, {
+    return fetch(`${this._baseUrl}users/me/avatar/`, {
       method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify(newAvatarUrl)
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Что-то не так с загрузкой нового аватара')
-    });
+    })
+      .then(this._checkResponse)
   }
 
   getCards() {
-    return fetch(this._cardsUrl, {
+    return fetch(`${this._baseUrl}cards/`, {
       method: 'GET',
       headers: this._headers
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Не удалось отобразить карточки');
-    });
+    })
+      .then(this._checkResponse)
   }
 
   postCard(data) {
-    return fetch(this._cardsUrl, {
+    return fetch(`${this._baseUrl}cards/`, {
       method: 'POST',
       headers: this._headers,
       body: JSON.stringify(data)
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Не удалось загрузить карточку')
-    });
+    })
+      .then(this._checkResponse)
   }
 
   deleteCard(id) {
-    return fetch(`${this._cardsUrl}${id}`, {
+    return fetch(`${this._baseUrl}cards/${id}`, {
       method: 'DELETE',
       headers: this._headers
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Карточка удалилась криво')
-    });
+    })
+      .then(this._checkResponse)
   }
 
   changeLikeCardStatus(id, isLiked) {
-    return fetch(`${this._cardsUrl}${id}/likes`, {
+    return fetch(`${this._baseUrl}cards/${id}/likes`, {
       method: isLiked ? 'DELETE' : 'PUT',
       headers: this._headers
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Не удалось поставить или удалить лайк')
-    });
-  }
-
-  register({ password, email }) {
-    return fetch(`${baseUrl}/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ password, email })
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Что-то пошло не так')
     })
-  }
-
-  login({ password, email }) {
-    return fetch(`${baseUrl}/signin`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ password, email })
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Что-то пошло не так');
-    })
-  }
-
-  getContent(token) {
-    return fetch(`${baseUrl}/users/me`, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject('Сначала авторизуйтесь');
-    });
+      .then(this._checkResponse)
   }
 }
 
 const api = new Api({
-  cardsUrl: 'https://mesto.nomoreparties.co/v1/cohort-43/cards/',
-  userInfoUrl: 'https://mesto.nomoreparties.co/v1/cohort-43/users/me/',
-  userAvatarUrl: 'https://mesto.nomoreparties.co/v1/cohort-43/users/me/avatar/',
+  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-43/',
   headers: {
     authorization: '0e5254a8-ef3a-48e3-8585-0243a3225307',
     'Content-Type': 'application/json',

@@ -10,7 +10,6 @@ function EditAvatarPopup(props) {
         props.onUpdateAvatar({
             avatar: userAvatarRef.current.value
         });
-        props.onClose();
     }
 
     useEffect(() => {

@@ -20,7 +20,6 @@ function AddPlacePopup(props) {
             name: name,
             link: link,
         });
-        props.onClose();
     }
 
     useEffect(() => {

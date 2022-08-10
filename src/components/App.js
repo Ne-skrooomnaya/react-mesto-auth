@@ -25,6 +25,7 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 import { Route, useNavigate, Routes, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
+import auth from '../utils/auth';
 
 function App() {
 
@@ -36,7 +37,8 @@ function App() {
   const [isInfoTooltipOpen, setInfoTooltipOpen] = useState({ opened: false, success: false })
 
   const [selectedCard, setSelectedCard] = useState({ name: '', link: '' });
-  const [currentUser, setCurrentUser] = useState({ name: '', link: '' });
+  const [currentUser, setCurrentUser] = useState({ name: '', about: '' });
+
   const [cards, setCards] = useState([]);
 
   const [loggedIn, setLoggedIn] = useState(false);
@@ -60,7 +62,7 @@ function App() {
       .catch((err) => {
         alert(err);
       });
-  }, [loggedIn]);
+  }, []);
 
 
   // nn
@@ -107,10 +109,12 @@ function App() {
     setInfoTooltipOpen({ opened: false, success: isInfoTooltipOpen.success })
   }
 
+
   const handleUpdateUser = ({ name, about }) => {
     api.editUserInfo({ name, about })
       .then(({ name, about }) => {
         setCurrentUser({ ...currentUser, name, about })
+        closeAllPopups();
       })
       .catch((err) => {
         alert(err);
@@ -121,6 +125,7 @@ function App() {
     api.editUserAvatar({ avatar })
       .then(({ avatar }) => {
         setCurrentUser({ ...currentUser, avatar })
+        closeAllPopups();
       })
       .catch((err) => {
         alert(err);
@@ -148,10 +153,11 @@ function App() {
       });
   }
 
-  const handleAddPlaceSubmit = (newCard) => {
+  const handleAddPlaceSubmit = (newCard,) => {
     api.postCard(newCard)
       .then((newCard) => {
         setCards([newCard, ...cards]);
+        closeAllPopups();
       })
       .catch((err) => {
         alert(err);
@@ -160,7 +166,7 @@ function App() {
 
   // nn
   const handleRegister = ({ password, email }) => {
-    return api.register({ password, email })
+    return auth.register({ password, email })
       .then(() => {
         setInfoTooltipOpen({ opened: true, success: true });
         navigate('/signin');
@@ -171,7 +177,7 @@ function App() {
   }
 
   const handleLogin = ({ password, email }) => {
-    return api.login({ password, email })
+    return auth.login({ password, email })
       .then((res) => {
         localStorage.setItem('token', res.token);
         tokenCheck();
@@ -191,7 +197,7 @@ function App() {
   const tokenCheck = () => {
     if (localStorage.getItem('token')) {
       const token = localStorage.getItem('token');
-      api.getContent(token).then((res) => {
+      auth.getContent(token).then((res) => {
         if (res) {
           setUserEmail(res.data.email);
           setLoggedIn(true);
