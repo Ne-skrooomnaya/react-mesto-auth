@@ -197,7 +197,7 @@ function App() {
   const tokenCheck = () => {
     if (localStorage.getItem('token')) {
       const token = localStorage.getItem('token');
-      auth.getContent(token).then((res) => {
+      auth.checkToken(token).then((res) => {
         if (res) {
           setUserEmail(res.data.email);
           setLoggedIn(true);
